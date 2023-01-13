@@ -37,11 +37,6 @@ jobs:
           pip install -r requirements.txt
           python app.py > build/index.html
           cp -r static/ build/
-      - name: Minify JS/CSS files
-        run: |
-          sudo apt install yui-compressor -y
-          yui-compressor -o '.js$:.js' build/static/js/*.js
-          yui-compressor -o '.css$:.css' build/static/css/*.css
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
