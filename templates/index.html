@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="keywords" content="Zero Sievert, Items, Price">
+        <meta name="description" content="Zero Sievert list of items with prices">
+        <title>Zakov Tools</title>
+        <link rel="icon" type="image/png" href="https://ui-avatars.com/api/?name=Zakov+Tools&background=0c0119&color=BB86FC&bold=true&font-size=0.6&size=32&rounded=true">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+            integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="static/css/styles.css">
+    </head>
+    <body>
+        <nav id="navbar">
+            <ul>
+                <li><a id="market-btn" class="active">Market</a></li>
+                <li><a id="about-btn" onclick="$('#about-modal').css('display', 'flex');">About</a></li>
+                <!-- <li style="float:right"><a id="settings-btn">Settings</a></li> -->
+            </ul>
+        </nav>
+        <div class="container">
+            <div id="items">
+                <h1 style="margin-bottom: 8px;">Zakov market</h1>
+                <div id="filter-div" style="margin-bottom: 10px;">
+                    <input id="nameFilter" class="form-control search" type="text" placeholder="Search by name..." style="width: 25em;">
+                    <select id="categoryFilter" class="form-control" style="width: 25em; margin-left: 8px;" onchange="applyFilters()">
+                        <option value="" selected disabled hidden>Filter by category...</option>
+                        <option value="all">All</option>
+                        <option value="equipment">Equipment</option>
+                        <option value="generic">Generic</option>
+                        <option value="key item">Key item</option>
+                        <option value="attachment">Attachment</option>
+                        <option value="medication">Medication</option>
+                        <option value="consumable">Consumable</option>
+                        <option value="weapon">Weapon</option>
+                    </select>
+                    <label class="form-control" style="font-size: small; margin-left: 8px;">
+                        <span>Hide non-lootable</span>
+                        <input type="checkbox" id="lootableFilter" onchange="applyFilters()" checked style="display: inline-block; vertical-align: middle;">
+                    </label>
+                </div>
+                <table id="table" style="width: 1200px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 14%;">IMAGE</th>
+                            <th style="width: 18%;">NAME</th>
+                            <th style="width: 7%;" class="sort" data-sort="price" onclick="changeArrow(this);">PRICE <i class="fas fa-sort"></i></th>
+                            <th style="width: 10%;" class="sort" data-sort="price-per-kg" onclick="changeArrow(this);">PRICE/KG <i class="fas fa-sort"></i></th>
+                            <th style="width: 11.5%;" class="sort" data-sort="price-per-slot" onclick="changeArrow(this);">PRICE/SLOT <i class="fas fa-sort"></i></th>
+                            <th style="width: 15.5%;" class="sort" data-sort="max-price-per-slot" onclick="changeArrow(this);">MAX. PRICE/SLOT <i class="fas fa-sort"></i></th>
+                            <th style="width: 10%;">MAX. STACK</th>
+                            <th style="width: 7.5%;">WEIGHT</th>
+                            <th style="width: 6.5%;">SIZE</th>
+                        </tr>
+                    </thead>
+                    <tbody class="list">
+                        {% for i, row in data.iterrows() %}
+                        <tr>
+                            <td style="width: 150px;">
+                                <img src="/static/img/{{ row['img_filename'] }}" class="item-icon">
+                            </td>
+                            <td style="width: 200px;">
+                                <span class="name" style="font-weight: bold; color: var(--secondary-color)">{{ row['name'] }}</span><br>
+                                <span class="category" style="font-size: smaller;">{{ row['category']|capitalize }}</span>
+                                {% if row['subcategory'] %}> <span class="subcategory" style="color: grey; font-size: smaller;">{{ row['subcategory']|capitalize }}</span>{% endif %}
+                            </td>
+                            <td class="price" style="color: {{ get_color(row['price'], [12.5, 50.0, 100.2, 246.9, 700.0, 1000.0, 1512.0, 2040.3, 4979.7]) }};">{{ row['price'] }} ₽</td>
+                            <td class="price-per-kg" style="color: {{ get_color(row['price_per_kg'], [200.0, 400.0, 650.0, 1000.0, 1800.0, 3266.0, 6646.4, 10020.1, 18000.0]) }};">{% if row['price_per_kg'] < 1000000 %}{{ row['price_per_kg'] }}{% else %}Inf.{% endif %} ₽</td>
+                            <td class="price-per-slot" style="color: {{ get_color(row['price_per_slot'], [10.0, 36.0, 80.0, 160.0, 353.5, 505.0, 720.6, 959.6, 1400.0]) }};">{{ row['price_per_slot'] }} ₽</td>
+                            <td class="max-price-per-slot" style="color: {{ get_color(row['max_price_per_slot'], [12.5, 50.0, 100.2, 246.8, 700.0, 1000.0, 1511.9, 2040.2, 4979.6]) }};">{{ row['max_price_per_slot'] }} ₽</td>
+                            <td class="max-stack">{{ row['max_stack'] }}</td>
+                            <td class="kg">{{ row['kg'] }} kg<br>
+                            <td class="size">{{ row['size'] }} slots</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="about-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="$('#about-modal').css('display', 'none');">&times;</span>
+                <h3 style="color: var(--secondary-color)">Welcome to Zakov Tools!</h3>
+                <p>Currently there is only one tool: <span style="color: var(--terciary-color); text-decoration: underline;">Zakov Market</span>, an interactive table where you can check the prices and stats of the items.</p>
+                <p>In the future I will try to release other tools (I am working on a tool to auto-detect items in inventory during the game in order to know their price more easily).</p>
+                <h4 style="text-decoration: underline; color: var(--primary-color);">What is currently implemented?</h4>
+                <ul>
+                    <li>Search by item's names <span style="font-size: small;">(use only numbers and letters, there is a bug using other characters)</span></li>
+                    <li>Filter by category</li>
+                    <li>Sort by prices</li>
+                    <li>Hide non-lootable items <span style="font-size: small;">(it hides equipment items, it's useful because backpacks have inf. ₽/kg)</span></li>
+                </ul>
+                <h4 style="text-decoration: underline; color: var(--primary-color);">What will be implemented in future versions?</h4>
+                <ul>
+                    <li>Items advanced stats <span style="font-size: small;">(this is hard, specially for attachments)</span></li>
+                    <li>Customize prices for different weapon durability <span style="font-size: small;">(right now the prices are for 100% durability weapons)</span></li>
+                    <li>Customize the columns to be displayed</li>
+                </ul>
+                <h4 style="text-decoration: underline; color: var(--primary-color);">How was data gathered?</h4>
+                <p>
+                    From the in-game debug inventory. Basically I used some Python scripts with computer vision capabilities in order to automatically detect some regions of interest.
+                    Sadly, the process has a lof of manual work, but I will try to train a Tesseract model to make this process automatic.
+                </p>
+                <p>
+                    The dataset isn't finished yet. I still need to collect all the stats in order to display them. Keep in mind that there will be errors in the data (I even found some typos in the in-game items).
+                    Please if you find any errors let me know. All help is welcome.
+                </p>
+                <h4 style="text-decoration: underline; color: var(--primary-color);">Support this project</h4>
+                <p>This project has been possible thanks to many hours in my spare time. Hopefully one day I can quit my job and dedicate myself to working on my own projects. If you liked this website and you can support me, I would appreciate it. If you can't, it's okay: the tool will always be free and ad-free 🙂</p>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <a style="margin-right: 50px;" href="bitcoin:bc1qg5vmgw9gyw63sgech0ewnc0kp65lgkuygm6r4wnczfhklxzxvjtqnmd03h">
+                        <img src="https://www.bitcoinqrcodemaker.com/api/?style=bitcoin&amp;address=bc1qg5vmgw9gyw63sgech0ewnc0kp65lgkuygm6r4wnczfhklxzxvjtqnmd03h" height="150" width="150"
+                            border="0" alt="Bitcoin QR code" title="bitcoin:bc1qg5vmgw9gyw63sgech0ewnc0kp65lgkuygm6r4wnczfhklxzxvjtqnmd03h">
+                    </a>
+                    <a style="margin-left: 50px;" href="https://www.buymeacoffee.com/zakovtools" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 80px !important; width: 280px !important;" ></a>
+                </div>
+                <h4 style="text-decoration: underline; color: var(--primary-color);">Contact</h4>
+                <ul>
+                    <li><a href="https://github.com/Zakov-Tools/zakov-tools.github.io/issues">Suggestions and bug reports</a></li>
+                </ul>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/list.js@2.3.1/dist/list.min.js" integrity="sha256-NEVvGNMGqFvs6adGLZjm5sLgcuX9rGTg1wlGtA1f7M8=" crossorigin="anonymous"></script>
+        <script src="/static/js/script.js"></script>
+        <script async src="https://static.getclicky.com/101389964.js"></script>
+        <noscript><p><img alt="Clicky" width="1" height="1" src="https://in.getclicky.com/101389964ns.gif" /></p></noscript>
+    </body>
+</html>

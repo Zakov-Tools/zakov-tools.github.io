@@ -1,1 +1,40 @@
-let options={valueNames:["name","category","subcategory","price","price-per-kg","price-per-slot","max-price-per-slot","max-stack","kg","size"],searchColumns:["name"]},itemsList=new List("items",options);const applyFilters=()=>{itemsList.filter(function(s){let a=$("#categoryFilter").val(),e=$("#lootableFilter").prop("checked"),o=s.values().category.toLowerCase();return(null===a||"all"===a||o===a)&&(!e||!!e&&-1===["equipment"].indexOf(o))})};applyFilters();const changeArrow=s=>{let a=$(s).find("i:first-child");$("i").not(a).removeClass("fa-sort-up"),$("i").not(a).removeClass("fa-sort-down"),$("i").not(a).addClass("fa-sort"),a.hasClass("fa-sort")?(a.removeClass("fa-sort"),a.addClass("fa-sort-up")):a.hasClass("fa-sort-up")?(a.removeClass("fa-sort-up"),a.addClass("fa-sort-down")):a.hasClass("fa-sort-down")&&(a.removeClass("fa-sort-down"),a.addClass("fa-sort-up"))},copyEmail=()=>{navigator.clipboard.writeText("zakov-tools.c41ar@simplelogin.com")};
+let options = {
+    valueNames: ["name", "category", "subcategory", "price", "price-per-kg", "price-per-slot", "max-price-per-slot", "max-stack", "kg", "size"],
+    searchColumns: ["name"]
+}
+let itemsList = new List("items", options);
+const applyFilters = () => {
+    itemsList.filter(function (item) {
+        let categoryFilter = $("#categoryFilter").val();
+        let lootableFilter = $("#lootableFilter").prop("checked");
+        let nonLootableCategories = ["equipment"];
+        let itemCat = item.values().category.toLowerCase();
+        if (((categoryFilter === null) || (categoryFilter === "all") || (itemCat === categoryFilter)) && ((!lootableFilter || (lootableFilter && nonLootableCategories.indexOf(itemCat) === -1)))) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+};
+applyFilters();
+
+const changeArrow = (elem) => {
+    let iconElem = $(elem).find("i:first-child");
+    $("i").not(iconElem).removeClass("fa-sort-up");
+    $("i").not(iconElem).removeClass("fa-sort-down");
+    $("i").not(iconElem).addClass("fa-sort");
+    if (iconElem.hasClass("fa-sort")) {
+        iconElem.removeClass("fa-sort");
+        iconElem.addClass("fa-sort-up");
+    } else if (iconElem.hasClass("fa-sort-up")) {
+        iconElem.removeClass("fa-sort-up");
+        iconElem.addClass("fa-sort-down");
+    } else if (iconElem.hasClass("fa-sort-down")) {
+        iconElem.removeClass("fa-sort-down");
+        iconElem.addClass("fa-sort-up");
+    }
+};
+
+const copyEmail = () => {
+    navigator.clipboard.writeText("zakov-to" + "ols.c41" + "ar@simp" + "lelogi" + "n.com")
+};
